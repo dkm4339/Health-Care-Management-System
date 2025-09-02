@@ -29,8 +29,8 @@ export default function Navbar() {
             <Link href="/doctors" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Doctors
             </Link>
-            <Link href="/appointments" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Appointments
+            <Link href="/appointment-booking" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Book Appointment
             </Link>
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contact
@@ -72,8 +72,8 @@ export default function Navbar() {
               <Link href="/doctors" className="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium">
                 Doctors
               </Link>
-              <Link href="/appointments" className="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium">
-                Appointments
+              <Link href="/appointment-booking" className="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium">
+                Book Appointment
               </Link>
               <Link href="/contact" className="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium">
                 Contact
