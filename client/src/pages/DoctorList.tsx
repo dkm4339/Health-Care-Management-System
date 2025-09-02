@@ -24,7 +24,7 @@ export default function DoctorList() {
   const filteredDoctors = Array.isArray(doctors) ? doctors.filter((doctor: any) => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = !specialtyFilter || doctor.specialty.toLowerCase() === specialtyFilter.toLowerCase();
+    const matchesSpecialty = !specialtyFilter || specialtyFilter === 'all' || doctor.specialty.toLowerCase() === specialtyFilter.toLowerCase();
     return matchesSearch && matchesSpecialty;
   }) : [];
 
@@ -56,7 +56,7 @@ export default function DoctorList() {
                 <SelectValue placeholder="All Specialties" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Specialties</SelectItem>
+                <SelectItem value="all">All Specialties</SelectItem>
                 {specialties.map((specialty: string) => (
                   <SelectItem key={specialty} value={specialty.toLowerCase()}>
                     {specialty}

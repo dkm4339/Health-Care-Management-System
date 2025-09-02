@@ -84,18 +84,17 @@ export default function Sidebar({ userType }: SidebarProps) {
             
             return (
               <li key={item.path}>
-                <Link href={item.path}>
-                  <a 
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-accent text-foreground'
-                    }`}
-                    data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </a>
+                <Link 
+                  href={item.path}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:bg-accent text-foreground'
+                  }`}
+                  data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
                 </Link>
               </li>
             );
