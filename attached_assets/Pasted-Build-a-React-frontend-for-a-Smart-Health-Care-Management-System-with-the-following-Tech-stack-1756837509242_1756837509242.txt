@@ -1,0 +1,79 @@
+Build a React frontend for a "Smart Health Care Management System" with the following:
+
+Tech stack:
+- React (functional components, hooks)
+- React Router (for navigation)
+- TailwindCSS (for styling, modern responsive UI)
+- Axios (for API calls to backend)
+- Socket.IO client (for real-time chat)
+- WebRTC integration (or placeholder) for video call
+
+Pages:
+1. **Login & Signup Page**
+   - Allow login/signup for patients, doctors, and admin
+   - Form with email, password, role (dropdown)
+   - Store JWT token in localStorage
+
+2. **Patient Dashboard**
+   - Show upcoming appointments
+   - Button to "Book Appointment"
+   - Sidebar navigation: Dashboard | Doctors | Chat | Video Call | Profile
+
+3. **Doctor Dashboard**
+   - Show today’s appointments
+   - List of patients with "Start Chat" or "Start Video Call"
+   - Sidebar navigation
+
+4. **Admin Dashboard**
+   - Manage doctors and users
+   - Simple table with add/remove doctor
+
+5. **Doctor List Page**
+   - Grid/list of doctors with name, specialty, rating, availability
+   - Button to "Book Appointment"
+
+6. **Appointment Booking Page**
+   - Calendar/slots UI to select doctor and time
+   - Confirmation button
+
+7. **Chat Page**
+   - Real-time 1-to-1 chat using Socket.IO
+   - Left sidebar: list of chats
+   - Right panel: messages with input box
+   - Persist chat history (from API)
+
+8. **Video Call Page**
+   - Simple UI with local video + remote video
+   - Buttons: mute, unmute, end call
+   - For MVP, just use WebRTC or Agora placeholder
+
+9. **Profile Page**
+   - Show/update user details
+
+Components:
+- Navbar
+- Sidebar
+- ProtectedRoute (checks JWT before rendering pages)
+- DoctorCard
+- AppointmentCard
+- ChatMessageBubble
+
+Styling:
+- Use Tailwind for clean, modern healthcare UI (blue/green theme)
+- Rounded cards, soft shadows
+- Responsive (desktop + mobile)
+
+Flow:
+- User logs in → JWT stored → redirected to dashboard based on role
+- Patients can browse doctors → book appointments → join chat/video
+- Doctors see schedule → accept patients → start consultation
+- Admin manages doctors
+
+Deliverables:
+- src/
+  - components/
+  - pages/
+  - App.js (with routes)
+  - services/api.js (axios instance)
+  - context/AuthContext.js
+- Tailwind configured
