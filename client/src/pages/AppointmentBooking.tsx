@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
 import Sidebar from '@/components/Layout/Sidebar';
 import Header from '@/components/Layout/Header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +24,7 @@ export default function AppointmentBooking() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Get doctorId from URL params if provided
   useEffect(() => {
@@ -35,7 +37,32 @@ export default function AppointmentBooking() {
 
   const { data: doctors } = useQuery({
     queryKey: ['/api/doctors'],
+    enabled: !!user, // Only fetch if user is authenticated
   });
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <Calendar className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h1>
+          <p className="text-gray-600 mb-6">
+            Please login to your account to book an appointment with our doctors.
+          </p>
+          <button 
+            onClick={() => setLocation('/login')}
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Login to Continue
+          </button>
+          <p className="text-sm text-gray-500 mt-4">
+            Don't have an account? Sign up when you click Login.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const selectedDoctor = Array.isArray(doctors) ? doctors.find((doctor: any) => doctor.id === selectedDoctorId) : undefined;
 
