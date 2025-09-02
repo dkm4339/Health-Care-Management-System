@@ -1,97 +1,51 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, GraduationCap, Clock, CheckCircle } from 'lucide-react';
+import { Star } from 'lucide-react';
+import { Link } from 'wouter';
 
-interface DoctorCardProps {
-  doctor: {
-    id: string;
-    name: string;
-    specialty: string;
-    education?: string;
-    experience?: number;
-    rating: number;
-    reviewCount: number;
-    isAvailable: boolean;
-  };
-  onBookAppointment: (doctorId: string) => void;
-}
-
-export default function DoctorCard({ doctor, onBookAppointment }: DoctorCardProps) {
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating / 10);
-    const hasHalfStar = (rating % 10) >= 5;
+export default function DoctorCard({ doctor }) {
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />);
-      } else {
-        stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
-      }
-    }
-    return stars;
+    return (
+      <div className="flex items-center space-x-1">
+        {[...Array(fullStars)].map((_, i) => (
+          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+        ))}
+        {hasHalfStar && <Star className="w-4 h-4 fill-yellow-200 text-yellow-400" />}
+        {[...Array(emptyStars)].map((_, i) => (
+          <Star key={i} className="w-4 h-4 text-gray-300" />
+        ))}
+        <span className="text-sm text-gray-600 ml-1">({doctor.reviewCount})</span>
+      </div>
+    );
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow" data-testid={`card-doctor-${doctor.id}`}>
-      <CardContent className="p-6">
-        <div className="flex items-center space-x-4 mb-4">
-          <Avatar className="w-16 h-16">
-            <AvatarImage src="" alt={doctor.name} />
-            <AvatarFallback className="text-lg font-semibold">
-              {doctor.name.split(' ').map(n => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-foreground" data-testid={`text-doctor-name-${doctor.id}`}>
-              {doctor.name}
-            </h3>
-            <p className="text-primary font-medium" data-testid={`text-specialty-${doctor.id}`}>
-              {doctor.specialty}
-            </p>
-            <div className="flex items-center mt-1">
-              <div className="flex">
-                {renderStars(doctor.rating)}
-              </div>
-              <span className="text-sm text-muted-foreground ml-2" data-testid={`text-rating-${doctor.id}`}>
-                {(doctor.rating / 10).toFixed(1)} ({doctor.reviewCount} reviews)
-              </span>
-            </div>
-          </div>
+    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+      <div className="text-center">
+        {/* Doctor Avatar */}
+        <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <span className="text-gray-500 text-sm">Doctor Image</span>
         </div>
         
-        <div className="space-y-2 mb-4">
-          {doctor.education && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <GraduationCap className="w-4 h-4 mr-2" />
-              <span data-testid={`text-education-${doctor.id}`}>{doctor.education}</span>
-            </div>
-          )}
-          {doctor.experience && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Clock className="w-4 h-4 mr-2" />
-              <span data-testid={`text-experience-${doctor.id}`}>{doctor.experience} years experience</span>
-            </div>
-          )}
-          <div className="flex items-center text-sm text-secondary">
-            <CheckCircle className="w-4 h-4 mr-2" />
-            <span data-testid={`text-availability-${doctor.id}`}>
-              {doctor.isAvailable ? 'Available today' : 'Next available: Tomorrow'}
-            </span>
-          </div>
+        {/* Doctor Info */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">{doctor.name}</h3>
+        <p className="text-blue-600 font-medium mb-2">{doctor.specialty}</p>
+        <p className="text-gray-600 text-sm mb-3">{doctor.experience} experience</p>
+        
+        {/* Rating */}
+        <div className="mb-4">
+          {renderStars(doctor.rating)}
         </div>
         
-        <Button 
-          onClick={() => onBookAppointment(doctor.id)}
-          className="w-full"
-          data-testid={`button-book-appointment-${doctor.id}`}
-        >
-          Book Appointment
-        </Button>
-      </CardContent>
-    </Card>
+        {/* Book Button */}
+        <Link href="/appointment-booking">
+          <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+            Book Appointment
+          </button>
+        </Link>
+      </div>
+    </div>
   );
 }

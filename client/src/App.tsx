@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Pages
+import Homepage from "@/pages/Homepage";
 import Login from "@/pages/Login";
 import PatientDashboard from "@/pages/PatientDashboard";
 import DoctorDashboard from "@/pages/DoctorDashboard";
@@ -22,8 +23,8 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
+      <Route path="/" component={Homepage} />
       <Route path="/login" component={Login} />
-      <Route path="/" component={Login} />
       
       {/* Protected routes */}
       <Route path="/patient">
@@ -44,13 +45,20 @@ function Router() {
         </ProtectedRoute>
       </Route>
       
-      <Route path="/doctors">
+      {/* Public routes for homepage navigation */}
+      <Route path="/doctors" component={DoctorList} />
+      <Route path="/appointment-booking" component={AppointmentBooking} />
+      <Route path="/contact" component={Homepage} />
+      <Route path="/about" component={Homepage} />
+      
+      {/* Protected doctor list for authenticated users */}
+      <Route path="/doctors-protected">
         <ProtectedRoute allowedRoles={['patient']}>
           <DoctorList />
         </ProtectedRoute>
       </Route>
       
-      <Route path="/appointment-booking">
+      <Route path="/appointment-booking-protected">
         <ProtectedRoute allowedRoles={['patient']}>
           <AppointmentBooking />
         </ProtectedRoute>

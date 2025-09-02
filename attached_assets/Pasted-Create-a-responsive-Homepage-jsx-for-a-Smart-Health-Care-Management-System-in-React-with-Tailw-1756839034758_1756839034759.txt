@@ -1,0 +1,57 @@
+Create a responsive **Homepage.jsx** for a "Smart Health Care Management System" in React with TailwindCSS. No backend required — use mock data and placeholders. The homepage should include:
+
+1. **Navbar (top)**
+   - Logo on left ("Smart Health Care")
+   - Links: Home, Doctors, Appointments, Contact
+   - Right side: Login / Signup buttons
+   - Responsive with hamburger menu on mobile
+
+2. **Hero Section**
+   - Big heading: "Consult Doctors Anytime, Anywhere"
+   - Subheading: "Book appointments, chat, or video call with certified doctors instantly."
+   - Two buttons: "Find Doctors" (link to /doctors) and "Book Appointment" (link to /appointments/book)
+   - Right side placeholder image (gray box with text "Hero Image")
+
+3. **Features Section (3–4 cards)**
+   - Cards with icon + title + short description:
+     - Video Consultations
+     - Instant Chat
+     - Easy Appointment Booking
+     - Secure Medical Records
+
+4. **How It Works Section (3 steps)**
+   - Step 1: Find a doctor
+   - Step 2: Book slot or start chat
+   - Step 3: Consult & get prescription
+   - Show steps in horizontal layout (stacked on mobile)
+
+5. **Featured Doctors Section**
+   - Grid of 3–4 doctor cards (mock data)
+   - Each card: Doctor name, specialty, rating ★★★★☆, "Book" button
+
+6. **Testimonials Section**
+   - 2–3 testimonials (mock data)
+   - Card with avatar placeholder, name, feedback text
+
+7. **Call-to-Action Section**
+   - Full-width colored strip: "Start your healthcare journey today!"
+   - Button: "Sign Up Now" → /signup
+
+8. **Footer**
+   - Links: About, Contact, Privacy Policy
+   - Social icons placeholders
+   - Copyright text
+
+Styling:
+- Use Tailwind classes with a healthcare theme (blue/green shades).
+- Rounded cards, shadows, responsive layout.
+- Mobile-friendly (stack sections vertically).
+
+Deliverables:
+- `src/pages/Homepage.jsx`
+- `src/components/Navbar.jsx`
+- `src/components/Footer.jsx`
+- `src/components/FeatureCard.jsx`
+- `src/components/DoctorCard.jsx`
+- `src/mock/doctors.js` and `src/mock/testimonials.js`
+- Update `App.js` route `/` → Homepage
