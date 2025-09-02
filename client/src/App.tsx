@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 // Pages
 import Homepage from "@/pages/Homepage";
 import Login from "@/pages/Login";
+import Contact from "@/pages/Contact";
 import PatientDashboard from "@/pages/PatientDashboard";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -48,8 +49,8 @@ function Router() {
       {/* Public routes for homepage navigation */}
       <Route path="/doctors" component={DoctorList} />
       <Route path="/appointment-booking" component={AppointmentBooking} />
-      <Route path="/contact" component={Homepage} />
-      <Route path="/about" component={Homepage} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/about" component={Contact} />
       
       {/* Protected doctor list for authenticated users */}
       <Route path="/doctors-protected">

@@ -152,7 +152,7 @@ export default function Homepage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredDoctors.map((doctor) => (
-              <DoctorCard key={doctor.id} doctor={doctor} />
+              <DoctorCard key={doctor.id.toString()} doctor={doctor} />
             ))}
           </div>
           <div className="text-center mt-12">
