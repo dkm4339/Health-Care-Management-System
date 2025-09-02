@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@shared/schema';
 import { apiRequest } from '@/services/api';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     const savedToken = localStorage.getItem('jwt_token');
@@ -74,6 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setToken(null);
     localStorage.removeItem('jwt_token');
+    
+    // Redirect to homepage
+    setLocation('/');
+    
+    // Show success message
+    toast({
+      title: "Successfully logged out",
+      description: "You have been logged out successfully. Thank you for using our platform!",
+    });
   };
 
   return (
