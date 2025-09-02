@@ -1,11 +1,27 @@
 import { Star } from 'lucide-react';
 import { Link } from 'wouter';
 
-export default function DoctorCard({ doctor }) {
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  rating: number;
+  reviewCount: number;
+  experience: string;
+}
+
+interface DoctorCardProps {
+  doctor: Doctor;
+}
+
+export default function DoctorCard({ doctor }: DoctorCardProps) {
+  if (!doctor) return null;
+
+  const renderStars = (rating: number) => {
+    const safeRating = Math.max(0, Math.min(5, rating || 0));
+    const fullStars = Math.floor(safeRating);
+    const hasHalfStar = safeRating % 1 !== 0;
+    const emptyStars = Math.max(0, 5 - fullStars - (hasHalfStar ? 1 : 0));
     
     return (
       <div className="flex items-center space-x-1">
@@ -16,7 +32,7 @@ export default function DoctorCard({ doctor }) {
         {[...Array(emptyStars)].map((_, i) => (
           <Star key={i} className="w-4 h-4 text-gray-300" />
         ))}
-        <span className="text-sm text-gray-600 ml-1">({doctor.reviewCount})</span>
+        <span className="text-sm text-gray-600 ml-1">({doctor?.reviewCount || 0})</span>
       </div>
     );
   };
@@ -30,13 +46,13 @@ export default function DoctorCard({ doctor }) {
         </div>
         
         {/* Doctor Info */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">{doctor.name}</h3>
-        <p className="text-blue-600 font-medium mb-2">{doctor.specialty}</p>
-        <p className="text-gray-600 text-sm mb-3">{doctor.experience} experience</p>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">{doctor?.name || 'Unknown Doctor'}</h3>
+        <p className="text-blue-600 font-medium mb-2">{doctor?.specialty || 'General Medicine'}</p>
+        <p className="text-gray-600 text-sm mb-3">{doctor?.experience || 'N/A'} experience</p>
         
         {/* Rating */}
         <div className="mb-4">
-          {renderStars(doctor.rating)}
+          {renderStars(doctor?.rating || 0)}
         </div>
         
         {/* Book Button */}
