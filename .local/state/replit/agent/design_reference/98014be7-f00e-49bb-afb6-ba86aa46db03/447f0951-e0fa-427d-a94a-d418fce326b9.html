@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Health Care Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                }
+            },
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222 15% 16%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222 15% 16%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222 15% 16%);
+            --primary: hsl(217 100% 50%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(159 75% 45%);
+            --secondary-foreground: hsl(0 0% 100%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215 16% 47%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222 15% 16%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(214 32% 91%);
+            --input: hsl(214 32% 91%);
+            --ring: hsl(217 100% 50%);
+            --radius: 0.5rem;
+            --font-sans: 'Inter', sans-serif;
+        }
+        
+        .dark {
+            --background: hsl(222 15% 8%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222 15% 12%);
+            --card-foreground: hsl(210 40% 98%);
+            --popover: hsl(222 15% 12%);
+            --popover-foreground: hsl(210 40% 98%);
+            --primary: hsl(217 91% 60%);
+            --primary-foreground: hsl(222 15% 8%);
+            --secondary: hsl(159 75% 35%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217 32% 15%);
+            --muted-foreground: hsl(215 20% 65%);
+            --accent: hsl(217 32% 15%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 62% 30%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(217 32% 20%);
+            --input: hsl(217 32% 20%);
+            --ring: hsl(217 91% 60%);
+        }
+        
+        body {
+            font-family: var(--font-sans);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .sidebar-link.active {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-online { background-color: hsl(var(--secondary)); }
+        .status-busy { background-color: hsl(var(--destructive)); }
+        .status-away { background-color: hsl(45 93% 47%); }
+    </style>
+</head>
+<body class="bg-background text-foreground antialiased">
+    <!-- @COMPONENT: App [main application container] -->
+    <div id="app" class="min-h-screen">
+        
+        <!-- Login Page -->
+        <!-- @COMPONENT: LoginPage [authentication form] -->
+        <div id="login-page" class="page active">
+            <div class="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
+                <div class="w-full max-w-md">
+                    <!-- Healthcare logo and branding -->
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
+                            <i class="fas fa-heartbeat text-primary-foreground text-2xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-foreground">HealthCare Pro</h1>
+                        <p class="text-muted-foreground mt-2">Smart Health Management System</p>
+                    </div>
+                    
+                    <div class="bg-card rounded-lg shadow-lg p-6 fade-in">
+                        <div class="mb-6">
+                            <div class="flex space-x-1 bg-muted p-1 rounded-md">
+                                <button id="login-tab" class="flex-1 py-2 px-3 rounded text-sm font-medium bg-background text-foreground shadow-sm">Login</button>
+                                <button id="signup-tab" class="flex-1 py-2 px-3 rounded text-sm font-medium text-muted-foreground hover:text-foreground">Sign Up</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <form id="login-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Email</label>
+                                <input type="email" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Enter your email" data-bind="email">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Password</label>
+                                <input type="password" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Enter your password" data-bind="password">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Role</label>
+                                <select class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" data-bind="role">
+                                    <option value="patient">Patient</option>
+                                    <option value="doctor">Doctor</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 font-medium transition-colors" data-event="click:handleLogin">Sign In</button>
+                        </form>
+                        
+                        <!-- Signup Form -->
+                        <form id="signup-form" class="space-y-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Full Name</label>
+                                <input type="text" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Enter your full name" data-bind="fullName">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Email</label>
+                                <input type="email" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Enter your email" data-bind="email">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Password</label>
+                                <input type="password" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Create a password" data-bind="password">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-foreground mb-2">Role</label>
+                                <select class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" data-bind="role">
+                                    <option value="patient">Patient</option>
+                                    <option value="doctor">Doctor</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 font-medium transition-colors" data-event="click:handleSignup">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: LoginPage -->
+
+        <!-- Patient Dashboard -->
+        <!-- @COMPONENT: PatientDashboard [patient main interface] -->
+        <div id="patient-dashboard" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Sidebar -->
+                <!-- @COMPONENT: Sidebar [navigation menu] -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Patient Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('patient-dashboard')">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('doctor-list')">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Find Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('chat-page')">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('profile-page')">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="p-4 border-t border-border">
+                        <button class="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors" data-event="click:handleLogout">
+                            <i class="fas fa-sign-out-alt w-4"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Sidebar -->
+                
+                <!-- Main Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <!-- Header -->
+                    <!-- @COMPONENT: Header [top navigation bar] -->
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Dashboard</h1>
+                                <p class="text-muted-foreground">Welcome back, <span data-bind="user.name" data-mock="true">John Doe</span></p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <button class="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
+                                    <i class="fas fa-bell text-lg"></i>
+                                    <span class="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></span>
+                                </button>
+                                <div class="flex items-center space-x-3">
+                                    <!-- Profile image placeholder for medical professional -->
+                                    <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="User profile" class="w-8 h-8 rounded-full object-cover" data-mock-image="true" data-implementation="Use user avatar component">
+                                    <span class="text-sm font-medium text-foreground" data-bind="user.name" data-mock="true">John Doe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <!-- @END_COMPONENT: Header -->
+                    
+                    <!-- Dashboard Content -->
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <!-- @COMPONENT: StatsCard [metric display] -->
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-primary/10 rounded-lg">
+                                        <i class="fas fa-calendar-check text-primary text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Upcoming Appointments</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.upcomingAppointments" data-mock="true">3</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-secondary/10 rounded-lg">
+                                        <i class="fas fa-user-md text-secondary text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Active Doctors</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.activeDoctors" data-mock="true">12</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-accent rounded-lg">
+                                        <i class="fas fa-comments text-accent-foreground text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">New Messages</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.newMessages" data-mock="true">2</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_COMPONENT: StatsCard -->
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Upcoming Appointments -->
+                            <div class="bg-card rounded-lg shadow-sm border border-border">
+                                <div class="p-6 border-b border-border flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold text-foreground">Upcoming Appointments</h3>
+                                    <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors" onclick="showPage('appointment-booking')">
+                                        Book New
+                                    </button>
+                                </div>
+                                <div class="p-6">
+                                    <!-- @MAP: appointments.map(appointment => ( -->
+                                    <!-- @COMPONENT: AppointmentCard [appointment display] -->
+                                    <div class="flex items-center space-x-4 p-4 bg-muted/50 rounded-lg mb-4 last:mb-0" data-mock="true">
+                                        <!-- Doctor profile image for cardiology specialist -->
+                                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60" alt="Dr. Sarah Johnson" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-foreground" data-bind="appointment.doctorName">Dr. Sarah Johnson</h4>
+                                            <p class="text-sm text-muted-foreground" data-bind="appointment.specialty">Cardiology</p>
+                                            <p class="text-sm text-secondary font-medium" data-bind="appointment.datetime">Today, 2:30 PM</p>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button class="p-2 text-primary hover:bg-primary/10 rounded" data-event="click:startChat">
+                                                <i class="fas fa-comment text-sm"></i>
+                                            </button>
+                                            <button class="p-2 text-secondary hover:bg-secondary/10 rounded" data-event="click:startVideoCall">
+                                                <i class="fas fa-video text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 p-4 bg-muted/50 rounded-lg mb-4" data-mock="true">
+                                        <!-- Doctor profile image for dermatology specialist -->
+                                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60" alt="Dr. Michael Chen" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-foreground" data-bind="appointment.doctorName">Dr. Michael Chen</h4>
+                                            <p class="text-sm text-muted-foreground" data-bind="appointment.specialty">Dermatology</p>
+                                            <p class="text-sm text-secondary font-medium" data-bind="appointment.datetime">Tomorrow, 10:00 AM</p>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button class="p-2 text-primary hover:bg-primary/10 rounded" data-event="click:startChat">
+                                                <i class="fas fa-comment text-sm"></i>
+                                            </button>
+                                            <button class="p-2 text-secondary hover:bg-secondary/10 rounded" data-event="click:startVideoCall">
+                                                <i class="fas fa-video text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- @END_MAP )) -->
+                                    <!-- @END_COMPONENT: AppointmentCard -->
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Activity -->
+                            <div class="bg-card rounded-lg shadow-sm border border-border">
+                                <div class="p-6 border-b border-border">
+                                    <h3 class="text-lg font-semibold text-foreground">Recent Activity</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="space-y-4">
+                                        <div class="flex items-start space-x-3" data-mock="true">
+                                            <div class="p-2 bg-primary/10 rounded-lg">
+                                                <i class="fas fa-calendar-plus text-primary text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-foreground">Appointment booked with Dr. Sarah Johnson</p>
+                                                <p class="text-xs text-muted-foreground">2 hours ago</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start space-x-3" data-mock="true">
+                                            <div class="p-2 bg-secondary/10 rounded-lg">
+                                                <i class="fas fa-file-medical text-secondary text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-foreground">Lab results received from Dr. Michael Chen</p>
+                                                <p class="text-xs text-muted-foreground">1 day ago</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start space-x-3" data-mock="true">
+                                            <div class="p-2 bg-accent rounded-lg">
+                                                <i class="fas fa-pills text-accent-foreground text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-foreground">Prescription updated for ongoing treatment</p>
+                                                <p class="text-xs text-muted-foreground">3 days ago</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: PatientDashboard -->
+
+        <!-- Doctor Dashboard -->
+        <!-- @COMPONENT: DoctorDashboard [doctor main interface] -->
+        <div id="doctor-dashboard" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Doctor Sidebar -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Doctor Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-users w-4"></i>
+                                <span>Patients</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('chat-page')">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('profile-page')">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="p-4 border-t border-border">
+                        <button class="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors" data-event="click:handleLogout">
+                            <i class="fas fa-sign-out-alt w-4"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Doctor Main Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Doctor Dashboard</h1>
+                                <p class="text-muted-foreground">Manage your patients and appointments</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="status-dot status-online"></span>
+                                <span class="text-sm text-secondary font-medium">Online</span>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <!-- Today's Schedule -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                            <div class="lg:col-span-2">
+                                <div class="bg-card rounded-lg shadow-sm border border-border">
+                                    <div class="p-6 border-b border-border">
+                                        <h3 class="text-lg font-semibold text-foreground">Today's Appointments</h3>
+                                        <p class="text-sm text-muted-foreground">Tuesday, March 12, 2024</p>
+                                    </div>
+                                    <div class="p-6">
+                                        <!-- @MAP: todayAppointments.map(appointment => ( -->
+                                        <div class="flex items-center justify-between p-4 bg-muted/50 rounded-lg mb-4 last:mb-0" data-mock="true">
+                                            <div class="flex items-center space-x-4">
+                                                <!-- Patient profile image -->
+                                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60" alt="Patient Alice Cooper" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                                <div>
+                                                    <h4 class="font-medium text-foreground" data-bind="appointment.patientName">Alice Cooper</h4>
+                                                    <p class="text-sm text-muted-foreground" data-bind="appointment.reason">Regular Checkup</p>
+                                                    <p class="text-sm text-primary font-medium" data-bind="appointment.time">10:30 AM - 11:00 AM</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm hover:bg-primary/90 transition-colors" data-event="click:startChat">
+                                                    <i class="fas fa-comment mr-1"></i>Chat
+                                                </button>
+                                                <button class="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm hover:bg-secondary/90 transition-colors" data-event="click:startVideoCall">
+                                                    <i class="fas fa-video mr-1"></i>Video
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between p-4 bg-muted/50 rounded-lg mb-4" data-mock="true">
+                                            <div class="flex items-center space-x-4">
+                                                <!-- Patient profile image for male patient -->
+                                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60" alt="Patient Robert Smith" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                                <div>
+                                                    <h4 class="font-medium text-foreground" data-bind="appointment.patientName">Robert Smith</h4>
+                                                    <p class="text-sm text-muted-foreground" data-bind="appointment.reason">Follow-up Consultation</p>
+                                                    <p class="text-sm text-primary font-medium" data-bind="appointment.time">2:00 PM - 2:30 PM</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm hover:bg-primary/90 transition-colors" data-event="click:startChat">
+                                                    <i class="fas fa-comment mr-1"></i>Chat
+                                                </button>
+                                                <button class="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm hover:bg-secondary/90 transition-colors" data-event="click:startVideoCall">
+                                                    <i class="fas fa-video mr-1"></i>Video
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- @END_MAP )) -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="space-y-6">
+                                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                                    <h3 class="text-lg font-semibold text-foreground mb-4">Today's Overview</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Total Appointments</span>
+                                            <span class="text-sm font-medium text-foreground" data-bind="stats.totalAppointments" data-mock="true">8</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Completed</span>
+                                            <span class="text-sm font-medium text-secondary" data-bind="stats.completed" data-mock="true">3</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Remaining</span>
+                                            <span class="text-sm font-medium text-primary" data-bind="stats.remaining" data-mock="true">5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                                    <h3 class="text-lg font-semibold text-foreground mb-4">Patient Messages</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-3" data-mock="true">
+                                            <!-- Patient profile image for messaging -->
+                                            <img src="https://pixabay.com/get/g1824e933e01b3b57d3437cfe075cb463f19c15310c03bb597a52d99db7fbadb45cb266fc9c682898f96071e1adc8fef810aa163fdb93f1e7dd1926a158b3e9c5_1280.jpg" alt="Patient Emma Wilson" class="w-8 h-8 rounded-full object-cover" data-mock-image="true">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-foreground" data-bind="message.patientName">Emma Wilson</p>
+                                                <p class="text-xs text-muted-foreground" data-bind="message.preview">Thank you for the consultation...</p>
+                                            </div>
+                                            <span class="w-2 h-2 bg-primary rounded-full"></span>
+                                        </div>
+                                        <div class="flex items-center space-x-3" data-mock="true">
+                                            <!-- Patient profile image for messaging -->
+                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Patient David Lee" class="w-8 h-8 rounded-full object-cover" data-mock-image="true">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-foreground" data-bind="message.patientName">David Lee</p>
+                                                <p class="text-xs text-muted-foreground" data-bind="message.preview">Question about medication...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: DoctorDashboard -->
+
+        <!-- Admin Dashboard -->
+        <!-- @COMPONENT: AdminDashboard [admin management interface] -->
+        <div id="admin-dashboard" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Admin Sidebar -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Admin Panel</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Manage Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-users w-4"></i>
+                                <span>Manage Users</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-calendar-alt w-4"></i>
+                                <span>Appointments</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-chart-bar w-4"></i>
+                                <span>Analytics</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="p-4 border-t border-border">
+                        <button class="w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors" data-event="click:handleLogout">
+                            <i class="fas fa-sign-out-alt w-4"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Admin Main Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Admin Dashboard</h1>
+                                <p class="text-muted-foreground">System management and oversight</p>
+                            </div>
+                            <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:addDoctor">
+                                <i class="fas fa-plus mr-2"></i>Add Doctor
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <!-- System Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-primary/10 rounded-lg">
+                                        <i class="fas fa-user-md text-primary text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Total Doctors</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.totalDoctors" data-mock="true">24</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-secondary/10 rounded-lg">
+                                        <i class="fas fa-users text-secondary text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Total Patients</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.totalPatients" data-mock="true">1,247</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-accent rounded-lg">
+                                        <i class="fas fa-calendar-check text-accent-foreground text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Today's Appointments</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.todayAppointments" data-mock="true">89</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg p-6 shadow-sm border border-border">
+                                <div class="flex items-center">
+                                    <div class="p-3 bg-destructive/10 rounded-lg">
+                                        <i class="fas fa-exclamation-triangle text-destructive text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-muted-foreground">Pending Issues</p>
+                                        <p class="text-2xl font-semibold text-foreground" data-bind="stats.pendingIssues" data-mock="true">3</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Doctor Management Table -->
+                        <div class="bg-card rounded-lg shadow-sm border border-border">
+                            <div class="p-6 border-b border-border">
+                                <h3 class="text-lg font-semibold text-foreground">Doctor Management</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-muted/50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Doctor</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Specialty</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Patients</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        <!-- @MAP: doctors.map(doctor => ( -->
+                                        <tr data-mock="true">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <!-- Doctor profile image for cardiology specialist -->
+                                                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Dr. Sarah Johnson" class="w-10 h-10 rounded-full object-cover" data-mock-image="true">
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-foreground" data-bind="doctor.name">Dr. Sarah Johnson</div>
+                                                        <div class="text-sm text-muted-foreground" data-bind="doctor.email">sarah.johnson@healthcare.com</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-foreground" data-bind="doctor.specialty">Cardiology</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/10 text-secondary">
+                                                    <span class="status-dot status-online mr-1"></span>
+                                                    Active
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-foreground" data-bind="doctor.patientCount">47</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button class="text-primary hover:text-primary/80 mr-3" data-event="click:editDoctor">Edit</button>
+                                                <button class="text-destructive hover:text-destructive/80" data-event="click:removeDoctor">Remove</button>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr data-mock="true">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <!-- Doctor profile image for dermatology specialist -->
+                                                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Dr. Michael Chen" class="w-10 h-10 rounded-full object-cover" data-mock-image="true">
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-foreground" data-bind="doctor.name">Dr. Michael Chen</div>
+                                                        <div class="text-sm text-muted-foreground" data-bind="doctor.email">michael.chen@healthcare.com</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-foreground" data-bind="doctor.specialty">Dermatology</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    <span class="status-dot status-away mr-1"></span>
+                                                    Away
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-foreground" data-bind="doctor.patientCount">32</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button class="text-primary hover:text-primary/80 mr-3" data-event="click:editDoctor">Edit</button>
+                                                <button class="text-destructive hover:text-destructive/80" data-event="click:removeDoctor">Remove</button>
+                                            </td>
+                                        </tr>
+                                        <!-- @END_MAP )) -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: AdminDashboard -->
+
+        <!-- Doctor List Page -->
+        <!-- @COMPONENT: DoctorListPage [doctor browsing interface] -->
+        <div id="doctor-list" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Patient Sidebar (reused) -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Patient Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('patient-dashboard')">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Find Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('chat-page')">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('profile-page')">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Doctor List Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Find Doctors</h1>
+                                <p class="text-muted-foreground">Browse and book appointments with our specialists</p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <input type="text" placeholder="Search doctors..." class="pl-10 pr-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring w-64" data-bind="searchQuery">
+                                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+                                </div>
+                                <select class="px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" data-bind="specialtyFilter">
+                                    <option value="">All Specialties</option>
+                                    <option value="cardiology">Cardiology</option>
+                                    <option value="dermatology">Dermatology</option>
+                                    <option value="neurology">Neurology</option>
+                                    <option value="orthopedics">Orthopedics</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- @MAP: doctors.map(doctor => ( -->
+                            <!-- @COMPONENT: DoctorCard [doctor profile display] -->
+                            <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <!-- Doctor profile image for cardiology specialist -->
+                                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80" alt="Dr. Sarah Johnson" class="w-16 h-16 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-foreground" data-bind="doctor.name">Dr. Sarah Johnson</h3>
+                                            <p class="text-primary font-medium" data-bind="doctor.specialty">Cardiology</p>
+                                            <div class="flex items-center mt-1">
+                                                <div class="flex text-yellow-400">
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-muted-foreground ml-2" data-bind="doctor.rating">4.9 (127 reviews)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 mb-4">
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-graduation-cap w-4 mr-2"></i>
+                                            <span data-bind="doctor.education">Harvard Medical School</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-clock w-4 mr-2"></i>
+                                            <span data-bind="doctor.experience">15 years experience</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-secondary">
+                                            <i class="fas fa-check-circle w-4 mr-2"></i>
+                                            <span>Available today</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 font-medium transition-colors" onclick="showPage('appointment-booking')" data-event="click:bookAppointment">
+                                        Book Appointment
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <!-- Doctor profile image for dermatology specialist -->
+                                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80" alt="Dr. Michael Chen" class="w-16 h-16 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-foreground" data-bind="doctor.name">Dr. Michael Chen</h3>
+                                            <p class="text-primary font-medium" data-bind="doctor.specialty">Dermatology</p>
+                                            <div class="flex items-center mt-1">
+                                                <div class="flex text-yellow-400">
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="far fa-star text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-muted-foreground ml-2" data-bind="doctor.rating">4.7 (89 reviews)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 mb-4">
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-graduation-cap w-4 mr-2"></i>
+                                            <span data-bind="doctor.education">Stanford Medical School</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-clock w-4 mr-2"></i>
+                                            <span data-bind="doctor.experience">12 years experience</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-yellow-600">
+                                            <i class="fas fa-clock w-4 mr-2"></i>
+                                            <span>Next available: Tomorrow</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 font-medium transition-colors" onclick="showPage('appointment-booking')" data-event="click:bookAppointment">
+                                        Book Appointment
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="p-6">
+                                    <div class="flex items-center space-x-4 mb-4">
+                                        <!-- Doctor profile image for neurology specialist -->
+                                        <img src="https://pixabay.com/get/g73efdb43710ece1141e74282ca3fc58cd1ffb4a2538e1a895622abc0d82524bd0ef3d08d4cf11e6913857ff349655ce47918914dad685cb9f5fa3858b36bd2ac_1280.jpg" alt="Dr. Emily Rodriguez" class="w-16 h-16 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-foreground" data-bind="doctor.name">Dr. Emily Rodriguez</h3>
+                                            <p class="text-primary font-medium" data-bind="doctor.specialty">Neurology</p>
+                                            <div class="flex items-center mt-1">
+                                                <div class="flex text-yellow-400">
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                    <i class="fas fa-star text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-muted-foreground ml-2" data-bind="doctor.rating">5.0 (203 reviews)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 mb-4">
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-graduation-cap w-4 mr-2"></i>
+                                            <span data-bind="doctor.education">Johns Hopkins University</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-muted-foreground">
+                                            <i class="fas fa-clock w-4 mr-2"></i>
+                                            <span data-bind="doctor.experience">18 years experience</span>
+                                        </div>
+                                        <div class="flex items-center text-sm text-secondary">
+                                            <i class="fas fa-check-circle w-4 mr-2"></i>
+                                            <span>Available today</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 font-medium transition-colors" onclick="showPage('appointment-booking')" data-event="click:bookAppointment">
+                                        Book Appointment
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                            <!-- @END_COMPONENT: DoctorCard -->
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: DoctorListPage -->
+
+        <!-- Appointment Booking Page -->
+        <!-- @COMPONENT: AppointmentBookingPage [appointment scheduling interface] -->
+        <div id="appointment-booking" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Patient Sidebar (reused) -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Patient Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('patient-dashboard')">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('doctor-list')">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Find Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('chat-page')">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('profile-page')">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Booking Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Book Appointment</h1>
+                                <p class="text-muted-foreground">Schedule your consultation</p>
+                            </div>
+                            <button class="text-muted-foreground hover:text-foreground" onclick="showPage('doctor-list')">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- Doctor Info -->
+                                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                                    <h3 class="text-lg font-semibold text-foreground mb-4">Selected Doctor</h3>
+                                    <div class="flex items-center space-x-4 mb-6" data-mock="true">
+                                        <!-- Selected doctor profile image -->
+                                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80" alt="Dr. Sarah Johnson" class="w-20 h-20 rounded-full object-cover" data-mock-image="true">
+                                        <div>
+                                            <h4 class="text-xl font-semibold text-foreground" data-bind="selectedDoctor.name">Dr. Sarah Johnson</h4>
+                                            <p class="text-primary font-medium" data-bind="selectedDoctor.specialty">Cardiology</p>
+                                            <p class="text-sm text-muted-foreground" data-bind="selectedDoctor.education">Harvard Medical School</p>
+                                            <div class="flex items-center mt-2">
+                                                <span class="status-dot status-online mr-2"></span>
+                                                <span class="text-sm text-secondary">Available</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-foreground mb-2">Appointment Type</label>
+                                            <select class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" data-bind="appointmentType">
+                                                <option value="consultation">Consultation</option>
+                                                <option value="followup">Follow-up</option>
+                                                <option value="checkup">Regular Checkup</option>
+                                                <option value="emergency">Emergency</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-foreground mb-2">Additional Notes</label>
+                                            <textarea class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring h-24 resize-none" placeholder="Describe your symptoms or reason for visit..." data-bind="appointmentNotes"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Calendar & Time Slots -->
+                                <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                                    <h3 class="text-lg font-semibold text-foreground mb-4">Select Date & Time</h3>
+                                    
+                                    <!-- Simple Calendar -->
+                                    <div class="mb-6">
+                                        <div class="grid grid-cols-7 gap-1 mb-4">
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Sun</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Mon</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Tue</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Wed</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Thu</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Fri</div>
+                                            <div class="text-center text-xs font-medium text-muted-foreground py-2">Sat</div>
+                                        </div>
+                                        
+                                        <!-- @FUNCTIONALITY: Calendar component should allow date selection with availability checking -->
+                                        <div class="grid grid-cols-7 gap-1">
+                                            <button class="aspect-square text-sm p-1 text-muted-foreground">10</button>
+                                            <button class="aspect-square text-sm p-1 text-muted-foreground">11</button>
+                                            <button class="aspect-square text-sm p-1 bg-primary text-primary-foreground rounded">12</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">13</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">14</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">15</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">16</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">17</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">18</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">19</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">20</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">21</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">22</button>
+                                            <button class="aspect-square text-sm p-1 hover:bg-accent rounded">23</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Time Slots -->
+                                    <div class="mb-6">
+                                        <h4 class="text-sm font-medium text-foreground mb-3">Available Times</h4>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <button class="py-2 px-3 text-sm border border-border rounded hover:bg-accent transition-colors" data-event="click:selectTimeSlot">9:00 AM</button>
+                                            <button class="py-2 px-3 text-sm border border-border rounded hover:bg-accent transition-colors" data-event="click:selectTimeSlot">10:30 AM</button>
+                                            <button class="py-2 px-3 text-sm bg-primary text-primary-foreground border border-primary rounded" data-event="click:selectTimeSlot">2:30 PM</button>
+                                            <button class="py-2 px-3 text-sm border border-border rounded hover:bg-accent transition-colors" data-event="click:selectTimeSlot">3:30 PM</button>
+                                            <button class="py-2 px-3 text-sm border border-border rounded hover:bg-accent transition-colors" data-event="click:selectTimeSlot">4:00 PM</button>
+                                            <button class="py-2 px-3 text-sm border border-border rounded opacity-50 cursor-not-allowed" disabled>5:00 PM</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="w-full bg-secondary text-secondary-foreground py-3 px-4 rounded-md hover:bg-secondary/90 font-medium transition-colors" data-event="click:confirmBooking" data-implementation="Should validate all fields before booking">
+                                        <i class="fas fa-check mr-2"></i>
+                                        Confirm Booking
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: AppointmentBookingPage -->
+
+        <!-- Chat Page -->
+        <!-- @COMPONENT: ChatPage [real-time messaging interface] -->
+        <div id="chat-page" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Patient Sidebar (reused) -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Patient Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('patient-dashboard')">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('doctor-list')">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Find Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('profile-page')">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Chat Interface -->
+                <div class="flex-1 flex">
+                    <!-- Chat List -->
+                    <div class="w-80 border-r border-border bg-card flex flex-col">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-lg font-semibold text-foreground">Messages</h2>
+                            <div class="relative mt-3">
+                                <input type="text" placeholder="Search conversations..." class="w-full pl-10 pr-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring text-sm" data-bind="chatSearchQuery">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 overflow-y-auto">
+                            <!-- @MAP: chatList.map(chat => ( -->
+                            <div class="border-b border-border hover:bg-muted/50 cursor-pointer transition-colors" data-mock="true" data-event="click:selectChat">
+                                <div class="p-4">
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Doctor profile image for chat list -->
+                                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&h=50" alt="Dr. Sarah Johnson" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="text-sm font-medium text-foreground truncate" data-bind="chat.doctorName">Dr. Sarah Johnson</h4>
+                                                <span class="text-xs text-muted-foreground" data-bind="chat.lastMessageTime">2:30 PM</span>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground truncate" data-bind="chat.lastMessage">How are you feeling after the medication?</p>
+                                        </div>
+                                        <span class="w-2 h-2 bg-primary rounded-full"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-b border-border hover:bg-muted/50 cursor-pointer transition-colors" data-mock="true" data-event="click:selectChat">
+                                <div class="p-4">
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Doctor profile image for chat list -->
+                                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&h=50" alt="Dr. Michael Chen" class="w-12 h-12 rounded-full object-cover" data-mock-image="true">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="text-sm font-medium text-foreground truncate" data-bind="chat.doctorName">Dr. Michael Chen</h4>
+                                                <span class="text-xs text-muted-foreground" data-bind="chat.lastMessageTime">Yesterday</span>
+                                            </div>
+                                            <p class="text-sm text-muted-foreground truncate" data-bind="chat.lastMessage">Your test results look good.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Messages -->
+                    <div class="flex-1 flex flex-col">
+                        <!-- Chat Header -->
+                        <div class="p-4 border-b border-border bg-card">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <!-- Active chat doctor profile image -->
+                                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Dr. Sarah Johnson" class="w-10 h-10 rounded-full object-cover" data-mock-image="true">
+                                    <div>
+                                        <h3 class="font-medium text-foreground" data-bind="activeChat.doctorName" data-mock="true">Dr. Sarah Johnson</h3>
+                                        <div class="flex items-center">
+                                            <span class="status-dot status-online mr-2"></span>
+                                            <span class="text-sm text-secondary">Online</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="bg-secondary text-secondary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary/90 transition-colors" onclick="showPage('video-call')" data-event="click:startVideoCall">
+                                    <i class="fas fa-video mr-2"></i>Video Call
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Messages Area -->
+                        <div class="flex-1 overflow-y-auto p-4 bg-muted/20">
+                            <div class="space-y-4">
+                                <!-- @MAP: messages.map(message => ( -->
+                                <!-- @COMPONENT: ChatMessageBubble [message display] -->
+                                <div class="flex items-start space-x-3" data-mock="true">
+                                    <!-- Doctor profile image for message -->
+                                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Dr. Sarah Johnson" class="w-8 h-8 rounded-full object-cover" data-mock-image="true">
+                                    <div class="flex-1">
+                                        <div class="bg-card rounded-lg p-3 shadow-sm">
+                                            <p class="text-sm text-foreground" data-bind="message.content">Hello! How are you feeling after taking the prescribed medication?</p>
+                                        </div>
+                                        <p class="text-xs text-muted-foreground mt-1" data-bind="message.timestamp">2:30 PM</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start space-x-3 justify-end" data-mock="true">
+                                    <div class="flex-1 flex justify-end">
+                                        <div class="bg-primary rounded-lg p-3 shadow-sm max-w-xs">
+                                            <p class="text-sm text-primary-foreground" data-bind="message.content">Much better, thank you! The chest pain has reduced significantly.</p>
+                                        </div>
+                                    </div>
+                                    <!-- Patient profile image for own message -->
+                                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Patient" class="w-8 h-8 rounded-full object-cover" data-mock-image="true">
+                                </div>
+                                <p class="text-xs text-muted-foreground text-right mr-11" data-bind="message.timestamp">2:32 PM</p>
+                                
+                                <div class="flex items-start space-x-3" data-mock="true">
+                                    <!-- Doctor profile image for message -->
+                                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="Dr. Sarah Johnson" class="w-8 h-8 rounded-full object-cover" data-mock-image="true">
+                                    <div class="flex-1">
+                                        <div class="bg-card rounded-lg p-3 shadow-sm">
+                                            <p class="text-sm text-foreground" data-bind="message.content">That's great to hear! Continue taking the medication as prescribed and let me know if you experience any side effects.</p>
+                                        </div>
+                                        <p class="text-xs text-muted-foreground mt-1" data-bind="message.timestamp">2:35 PM</p>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                                <!-- @END_COMPONENT: ChatMessageBubble -->
+                            </div>
+                        </div>
+                        
+                        <!-- Message Input -->
+                        <div class="p-4 border-t border-border bg-card">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-1 relative">
+                                    <input type="text" placeholder="Type your message..." class="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring pr-12" data-bind="messageInput">
+                                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground" data-event="click:attachFile">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                </div>
+                                <button class="bg-primary text-primary-foreground p-3 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:sendMessage" data-implementation="Should integrate with Socket.IO for real-time messaging">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ChatPage -->
+
+        <!-- Video Call Page -->
+        <!-- @COMPONENT: VideoCallPage [video consultation interface] -->
+        <div id="video-call" class="page">
+            <div class="h-screen bg-gray-900 flex flex-col">
+                <!-- Video Call Header -->
+                <div class="bg-gray-800 p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="status-dot status-online"></span>
+                            <span class="text-white font-medium" data-bind="call.doctorName" data-mock="true">Dr. Sarah Johnson</span>
+                        </div>
+                        <span class="text-gray-300 text-sm" data-bind="call.duration" data-mock="true">15:42</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-300 text-sm">Consultation in progress</span>
+                    </div>
+                </div>
+                
+                <!-- Video Area -->
+                <div class="flex-1 relative bg-gray-900">
+                    <!-- Remote Video (Doctor) -->
+                    <div class="w-full h-full relative">
+                        <!-- Doctor during video consultation -->
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800" alt="Dr. Sarah Johnson during video call" class="w-full h-full object-cover" data-mock-image="true" data-implementation="Use WebRTC video element here">
+                        
+                        <!-- Local Video (Patient) - Picture in Picture -->
+                        <div class="absolute top-4 right-4 w-48 h-36 bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-600">
+                            <!-- Patient during video consultation -->
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=150" alt="Patient during video call" class="w-full h-full object-cover" data-mock-image="true" data-implementation="Use WebRTC local video element here">
+                        </div>
+                        
+                        <!-- Video Call UI Overlay -->
+                        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+                            <div class="flex items-center space-x-4 bg-gray-800/90 backdrop-blur-sm rounded-full px-6 py-3">
+                                <button class="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors" data-event="click:toggleMute" data-implementation="Should toggle microphone mute state">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors" data-event="click:toggleVideo" data-implementation="Should toggle camera on/off">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors" data-event="click:shareScreen">
+                                    <i class="fas fa-desktop"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-destructive hover:bg-destructive/90 rounded-full flex items-center justify-center text-destructive-foreground transition-colors" data-event="click:endCall" data-implementation="Should end WebRTC connection and redirect">
+                                    <i class="fas fa-phone-slash"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors" onclick="showPage('chat-page')" data-event="click:openChat">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Call Info -->
+                        <div class="absolute top-4 left-4 bg-gray-800/90 backdrop-blur-sm rounded-lg px-4 py-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="status-dot status-online"></span>
+                                <span class="text-white text-sm font-medium">Connection: Excellent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: VideoCallPage -->
+
+        <!-- Profile Page -->
+        <!-- @COMPONENT: ProfilePage [user profile management] -->
+        <div id="profile-page" class="page">
+            <div class="flex h-screen bg-background">
+                <!-- Patient Sidebar (reused) -->
+                <div class="w-64 bg-card border-r border-border flex flex-col">
+                    <div class="p-6 border-b border-border">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-primary-foreground"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-semibold text-foreground">HealthCare Pro</h2>
+                                <p class="text-sm text-muted-foreground">Patient Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <nav class="flex-1 p-4">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('patient-dashboard')">
+                                <i class="fas fa-chart-line w-4"></i>
+                                <span>Dashboard</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('doctor-list')">
+                                <i class="fas fa-user-md w-4"></i>
+                                <span>Find Doctors</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('chat-page')">
+                                <i class="fas fa-comments w-4"></i>
+                                <span>Chat</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors" onclick="showPage('video-call')">
+                                <i class="fas fa-video w-4"></i>
+                                <span>Video Call</span>
+                            </a></li>
+                            <li><a href="#" class="sidebar-link active flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent transition-colors">
+                                <i class="fas fa-user w-4"></i>
+                                <span>Profile</span>
+                            </a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Profile Content -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <header class="bg-card border-b border-border px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-semibold text-foreground">Profile Settings</h1>
+                                <p class="text-muted-foreground">Manage your personal information</p>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <main class="flex-1 overflow-y-auto p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Profile Picture & Basic Info -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-card rounded-lg shadow-sm border border-border p-6 text-center">
+                                        <!-- Patient profile image for profile page -->
+                                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150" alt="Patient profile" class="w-24 h-24 rounded-full object-cover mx-auto mb-4" data-mock-image="true" data-implementation="Use FileUpload component here">
+                                        <h3 class="text-lg font-semibold text-foreground" data-bind="user.name" data-mock="true">John Doe</h3>
+                                        <p class="text-muted-foreground" data-bind="user.email" data-mock="true">john.doe@email.com</p>
+                                        <p class="text-sm text-primary font-medium mt-2">Patient ID: <span data-bind="user.patientId" data-mock="true">#P12345</span></p>
+                                        
+                                        <button class="mt-4 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:changeProfilePicture">
+                                            Change Photo
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Profile Form -->
+                                <div class="lg:col-span-2">
+                                    <div class="bg-card rounded-lg shadow-sm border border-border p-6">
+                                        <h3 class="text-lg font-semibold text-foreground mb-6">Personal Information</h3>
+                                        
+                                        <form class="space-y-6" data-event="submit:updateProfile">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">First Name</label>
+                                                    <input type="text" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="John" data-bind="user.firstName">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">Last Name</label>
+                                                    <input type="text" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="Doe" data-bind="user.lastName">
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-foreground mb-2">Email Address</label>
+                                                <input type="email" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="john.doe@email.com" data-bind="user.email">
+                                            </div>
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">Phone Number</label>
+                                                    <input type="tel" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="+1 (555) 123-4567" data-bind="user.phone">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">Date of Birth</label>
+                                                    <input type="date" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="1990-05-15" data-bind="user.dateOfBirth">
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-foreground mb-2">Address</label>
+                                                <textarea class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring h-20 resize-none" placeholder="Enter your address" data-bind="user.address">123 Main Street, Cityville, State 12345</textarea>
+                                            </div>
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">Emergency Contact</label>
+                                                    <input type="text" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="Jane Doe" data-bind="user.emergencyContact">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-foreground mb-2">Emergency Phone</label>
+                                                    <input type="tel" class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring" value="+1 (555) 987-6543" data-bind="user.emergencyPhone">
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-foreground mb-2">Medical History</label>
+                                                <textarea class="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring h-24 resize-none" placeholder="Brief medical history, allergies, current medications..." data-bind="user.medicalHistory">No known allergies. Taking daily vitamins.</textarea>
+                                            </div>
+                                            
+                                            <div class="flex justify-end space-x-4">
+                                                <button type="button" class="px-6 py-2 border border-border rounded-md text-foreground hover:bg-accent transition-colors" data-event="click:cancelEdit">
+                                                    Cancel
+                                                </button>
+                                                <button type="submit" class="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors" data-event="click:saveProfile">
+                                                    Save Changes
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProfilePage -->
+        
+    </div>
+    <!-- @END_COMPONENT: App -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        
+        (function() {
+            // Page navigation system
+            let currentPage = 'login-page';
+            let userRole = null;
+            
+            window.showPage = function(pageId) {
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Show selected page
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    currentPage = pageId;
+                    
+                    // Update sidebar active states
+                    updateSidebarActiveState(pageId);
+                }
+            };
+            
+            function updateSidebarActiveState(activePageId) {
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Find and activate the corresponding sidebar link
+                const activePage = document.getElementById(activePageId);
+                if (activePage) {
+                    const sidebarLinks = activePage.querySelectorAll('.sidebar-link');
+                    sidebarLinks.forEach(link => {
+                        if (link.onclick && link.onclick.toString().includes(activePageId)) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            }
+            
+            // Tab switching for login/signup
+            document.getElementById('login-tab').addEventListener('click', function() {
+                this.classList.add('bg-background', 'text-foreground', 'shadow-sm');
+                this.classList.remove('text-muted-foreground');
+                
+                document.getElementById('signup-tab').classList.remove('bg-background', 'text-foreground', 'shadow-sm');
+                document.getElementById('signup-tab').classList.add('text-muted-foreground');
+                
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('signup-form').classList.add('hidden');
+            });
+            
+            document.getElementById('signup-tab').addEventListener('click', function() {
+                this.classList.add('bg-background', 'text-foreground', 'shadow-sm');
+                this.classList.remove('text-muted-foreground');
+                
+                document.getElementById('login-tab').classList.remove('bg-background', 'text-foreground', 'shadow-sm');
+                document.getElementById('login-tab').classList.add('text-muted-foreground');
+                
+                document.getElementById('signup-form').classList.remove('hidden');
+                document.getElementById('login-form').classList.add('hidden');
+            });
+            
+            // Simulate login
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const role = this.querySelector('select').value;
+                userRole = role;
+                
+                // Simulate JWT storage
+                localStorage.setItem('jwt_token', 'mock_jwt_token');
+                localStorage.setItem('user_role', role);
+                
+                // Redirect based on role
+                if (role === 'patient') {
+                    showPage('patient-dashboard');
+                } else if (role === 'doctor') {
+                    showPage('doctor-dashboard');
+                } else if (role === 'admin') {
+                    showPage('admin-dashboard');
+                }
+            });
+            
+            // Simulate signup
+            document.getElementById('signup-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const role = this.querySelector('select').value;
+                userRole = role;
+                
+                // Simulate JWT storage
+                localStorage.setItem('jwt_token', 'mock_jwt_token');
+                localStorage.setItem('user_role', role);
+                
+                // Redirect based on role
+                if (role === 'patient') {
+                    showPage('patient-dashboard');
+                } else if (role === 'doctor') {
+                    showPage('doctor-dashboard');
+                }
+            });
+            
+            // Demo navigation buttons
+            window.showPatientDashboard = function() {
+                userRole = 'patient';
+                showPage('patient-dashboard');
+            };
+            
+            window.showDoctorDashboard = function() {
+                userRole = 'doctor';
+                showPage('doctor-dashboard');
+            };
+            
+            window.showAdminDashboard = function() {
+                userRole = 'admin';
+                showPage('admin-dashboard');
+            };
+            
+            // Check for existing session
+            const existingToken = localStorage.getItem('jwt_token');
+            const existingRole = localStorage.getItem('user_role');
+            
+            if (existingToken && existingRole) {
+                userRole = existingRole;
+                if (existingRole === 'patient') {
+                    showPage('patient-dashboard');
+                } else if (existingRole === 'doctor') {
+                    showPage('doctor-dashboard');
+                } else if (existingRole === 'admin') {
+                    showPage('admin-dashboard');
+                }
+            }
+        })();
+    </script>
+    
+    <!-- Demo Navigation (for testing purposes) -->
+    <div class="fixed bottom-4 right-4 bg-card border border-border rounded-lg shadow-lg p-4 z-50">
+        <p class="text-sm font-medium text-foreground mb-2">Demo Navigation:</p>
+        <div class="space-y-1">
+            <button onclick="showPage('login-page')" class="block w-full text-left text-xs text-primary hover:text-primary/80">Login</button>
+            <button onclick="showPatientDashboard()" class="block w-full text-left text-xs text-primary hover:text-primary/80">Patient Dashboard</button>
+            <button onclick="showDoctorDashboard()" class="block w-full text-left text-xs text-primary hover:text-primary/80">Doctor Dashboard</button>
+            <button onclick="showAdminDashboard()" class="block w-full text-left text-xs text-primary hover:text-primary/80">Admin Dashboard</button>
+        </div>
+    </div>
+</body>
+</html>
